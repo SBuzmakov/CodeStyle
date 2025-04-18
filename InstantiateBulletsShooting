@@ -1,0 +1,50 @@
+using System.Collections;
+using UnityEngine;
+
+public class Shooter : MonoBehaviour
+{
+    [SerializeField] private GameObject _bulletPrefab;
+    [SerializeField] private float _bulletSpeed;
+    [SerializeField] private float _shootingDelay;
+    [SerializeField] Transform _target;
+    
+    private bool _isWork = true;
+    private Coroutine _coroutine;
+
+    void Start()
+    {
+        _coroutine = StartCoroutine(ShootingJob());
+    }
+
+    IEnumerator ShootingJob()
+    {
+        WaitForSeconds wait = new WaitForSeconds(_shootingDelay);
+
+        while (_isWork)
+        {
+            Shoot();
+
+            yield return wait;
+        }
+
+        _coroutine = null;
+    }
+
+    private void Shoot()
+    {
+        if (_target == null)
+            return;
+        
+        Vector3 shootDirection = (_target.position - transform.position).normalized;
+        Vector3 bulletPosition = transform.position + shootDirection;
+        
+        Bullet newBullet = Instantiate(_bulletPrefab, bulletPosition, Quaternion.identity);
+        
+        newBullet.transform.up = shootDirection;
+        
+        if (newBullet.TryGetComponent<Rigidbody>(out Rigidbody rigidbody))
+        {
+            rigidbody.velocity = shootDirection * _bulletSpeed;
+        }
+    }
+}

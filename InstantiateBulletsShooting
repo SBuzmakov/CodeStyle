@@ -11,26 +11,12 @@ public class Shooter : MonoBehaviour
     private bool _isWork = true;
     private Coroutine _coroutine;
 
-    void Start()
+    private void Start()
     {
         _coroutine = StartCoroutine(ShootingJob());
     }
 
-    IEnumerator ShootingJob()
-    {
-        WaitForSeconds wait = new WaitForSeconds(_shootingDelay);
-
-        while (_isWork)
-        {
-            Shoot();
-
-            yield return wait;
-        }
-
-        _coroutine = null;
-    }
-
-    private void Shoot()
+    public void Shoot()
     {
         if (_target == null)
             return;
@@ -46,5 +32,19 @@ public class Shooter : MonoBehaviour
         {
             rigidbody.velocity = shootDirection * _bulletSpeed;
         }
+    }
+
+    private IEnumerator ShootingJob()
+    {
+        WaitForSeconds wait = new WaitForSeconds(_shootingDelay);
+
+        while (_isWork)
+        {
+            Shoot();
+
+            yield return wait;
+        }
+
+        _coroutine = null;
     }
 }

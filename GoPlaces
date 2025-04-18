@@ -1,0 +1,40 @@
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+public class Mover : MonoBehaviour
+{
+    private const float MinDistance = 0.1f;
+
+    [SerializeField] private Transform _waypointsParent;
+    [SerializeField, Min(0)] private float _speed;
+
+    private List<Transform> _waypoints;
+    private int _currentTargetIndex = 1;
+
+    private void Start()
+    {
+        _waypoints = _waypointsParent.GetComponentsInChildren<Transform>().ToList();
+
+        _waypoints.RemoveAt(0);
+    }
+
+    private void Update()
+    {
+        transform.position =
+            Vector3.MoveTowards(transform.position, _waypoints[_currentTargetIndex].position, _speed * Time.deltaTime);
+
+        if (IsNeedChangePoint(transform.position, _waypoints[_currentTargetIndex].position))
+            UpdateTargetIndex();
+    }
+
+    private void UpdateTargetIndex()
+    {
+        _currentTargetIndex = (_currentTargetIndex + 1) % _waypoints.Count;
+    }
+
+    private bool IsNeedChangePoint(Vector3 currentPosition, Vector3 targetPosition)
+    {
+        return (targetPosition - currentPosition).sqrMagnitude <= MinDistance * MinDistance;
+    }
+}
